@@ -1,4 +1,4 @@
-Temat: Modelowanie turbin wiatrowych
+# Temat: Modelowanie turbin wiatrowych
 
 Cel: opracowanie szczegółowego tutorialu w formie prezentacji PowerPoint ukazującego proces przygotowywania geometrii, siatkowania i prowadzenia symulacji wariantowych na przykładzie turbiny wiatrowej o pionowej osi obrotu w środowisku PyAnsys, celem przeprowadzenia obliczeń w sposób zautomatyzowany.
 
