@@ -1,5 +1,6 @@
 from ansys.geometry.core import launch_modeler
 from model.D2_5.geometry.SketchController import SketchController
+from model.D2_5.geometry.misc.PATHS import RESULTS
 
 
 class ModelerController:
@@ -7,7 +8,7 @@ class ModelerController:
     ModelerController is a class for create, run and save modeler environment (Discovery).
     """
     def __init__(self, design_name: str):
-        self.modeler = launch_modeler(mode="Discovery")
+        self.modeler = launch_modeler(mode="Discovery", **{"timeout": 500})
         print(self.modeler)
 
         self.design_name = design_name
@@ -66,6 +67,16 @@ class ModelerController:
         Plot the design.
         """
         self.design.plot()
+
+    def save(self, file_name: str):
+        """
+        Save your project.
+
+        Args:
+            file_name (str): name of your file
+        """
+        self.design.export_to_scdocx(RESULTS / file_name)
+        print(f"File exported to: {RESULTS / file_name}")
 
     def close(self):
         """

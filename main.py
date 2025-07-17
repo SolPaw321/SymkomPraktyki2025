@@ -22,6 +22,7 @@ def main():
     radius = Distance(5)
     angle_of_attack_deg = Angle(90.0)
     spread = Distance(0.4)
+    file_name = "model"
 
     modeler = ModelerController("Wind Turbine")
 
@@ -74,6 +75,7 @@ def main():
     modeler.add_component_and_named_selection("BoI", boi_sketch, "BoI")
 
     # -- Plot in Discovery -- #
+    modeler.save(file_name)
     modeler.plot()
     modeler.close()
 
