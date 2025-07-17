@@ -25,3 +25,6 @@ Symulacja we Fluencie powinna uwzględniąć analizę wariantową dla różnych:
  - prędkości obrotowych turbiny
 
 W prowadzonej analizie użytkownik powinien mieć wgląd w raporty z każdej symulacji ukazujące residua, moment i moc na turbinie, prędkość obrotową, bilans masy. Użytkownik powinien móc na bazie symulacji ocenić ich wiarygodność i przeprowadzić konieczny post-processing danych, z możliwością podglądu konturu modułu prędkości w domenie co n iteracji. Na dysku został zamieszczony przykładowy projekt turbiny 3D_3_mrf jako punkt odniesienia
+
+# Użycie
+Poprać repozytorium i uruchomić plik main.py
