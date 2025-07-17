@@ -1,7 +1,7 @@
 from ansys.geometry.core.math import Point2D
 from math import radians, cos, sin
 from ansys.geometry.core.misc import Distance, Angle
-from model.D2.geometry.Airfoil import Airfoil
+from model.D2_5.geometry.Airfoil import Airfoil
 
 
 def points_rotation(points: list[Point2D] | Point2D,
@@ -10,11 +10,11 @@ def points_rotation(points: list[Point2D] | Point2D,
     """
     Rotate a list of points (or a single point) around center by angle.
 
-    :param:
+    Args:
         points (list[Point2D] | Point2D): list of points or single point to rotate
         center (Point2D): the center of rotation
         angle (Angle): the angle (degrees) to rotate
-    :return:
+    Return:
         list[Point2D] | Point2D: list of rotated points or single rotated point
     """
     if isinstance(points, Point2D):
@@ -24,7 +24,7 @@ def points_rotation(points: list[Point2D] | Point2D,
         list_return = True
 
     new_points = []
-    angle_rad = radians(angle.value)
+    angle_rad = radians(angle.value.m)
     for point in points:
         translated_x = point.x - center.x
         translated_y = point.y - center.y
@@ -50,18 +50,18 @@ def translate_airfoil_on_circle(foil: Airfoil,
     """
     Place an Airfoil on a circle.
 
-    :param:
+    Args:
         foil (Airfoil): Airfoil with list of points
         center (Point2D): center of circle
         radius (Distance): radius of circle
         angle_deg (Angle): interior angle (degrees)
         angle_of_attack_deg (Angle): angle of attack (degrees)
-    :return:
+    Return:
         Airfoil: Airfoil with set new points
     """
     points = foil.points
-    cx = center.x + radius.value * cos(radians(angle_deg.value))
-    cy = center.y + radius.value * sin(radians(angle_deg.value))
+    cx = center.x + radius.value * cos(radians(angle_deg.value.m))
+    cy = center.y + radius.value * sin(radians(angle_deg.value.m))
     new_center = Point2D([cx.m, cy.m])
 
     translated = []

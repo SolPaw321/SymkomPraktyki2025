@@ -22,10 +22,10 @@ class Airfoil:
         """
         Validate "number" parameter.
 
-        :param:
+        Args:
             number (str | int): The number of points that make up a NACA airfoil.
 
-        :raise:
+        Raise:
             TypeError: number is not str or int
             ValueError: number is not 4-digit
         """
@@ -39,10 +39,10 @@ class Airfoil:
         """
         Validate "n_points" parameter.
 
-        :param:
+        Args:
             n_points (str | int): The number of points that make up a NACA airfoil.
 
-        :raise:
+        Raise:
             TypeError: n_points is not str or int
             ValueError: n_points is not positive
         """
@@ -63,7 +63,7 @@ class Airfoil:
         """
             Generate a NACA 4-digits airfoil.
 
-            :return:
+            Return:
                 list[Point2D]: List of points that define the airfoil
             """
         for i in range(self.n_points):
@@ -116,7 +116,7 @@ class Airfoil:
         """
         Return List of points that define the airfoil.
 
-        :return:
+        Args:
             list[Point2D]: List of points that define the airfoil
         """
         return self._points
@@ -126,7 +126,7 @@ class Airfoil:
         """
         Set new points.
 
-        :param:
+        Args:
             points (list[Point2D]): list of new points to set
         """
         self._points = points
