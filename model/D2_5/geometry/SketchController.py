@@ -125,9 +125,9 @@ class SketchController:
         """
         self.sketch.plot()
 
-    def get(self) -> tuple[str, Sketch, Distance]:
+    def get(self) -> tuple[str, Sketch]:
         """
         Return:
             tuple[str, Sketch, Distance]: name, Sketch and high
         """
-        return self.name, self.sketch, Distance(0.1)
+        return self.name, self.sketch

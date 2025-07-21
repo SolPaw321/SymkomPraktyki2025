@@ -25,6 +25,22 @@ def main():
     file_name = "model"
 
     modeler = ModelerController("Wind Turbine")
+    # --- Ring without cuts --- #
+
+    ring_sketch = SketchController("Ring")
+    ring_sketch.add_ring(center, radius, spread)
+
+    modeler.add_component("Ring", ring_sketch)
+    modeler.add_named_selection("Ring", "fluid-2")
+
+    # --- Inner circle --- #
+
+    inner_radius = Distance(radius.value.m - spread.value.m / 2.0)
+    inner_circle_sketch = SketchController("Inner Circle")
+    inner_circle_sketch.add_circle(center, inner_radius)
+
+    modeler.add_component("Inner Circle", inner_circle_sketch)
+    modeler.add_named_selection("Inner Circle", "fluid-3")
 
     # --- Airfoils --- #
     airfoil_sketches = []
@@ -39,40 +55,32 @@ def main():
 
         airfoil_sketches.append(sketch)
 
-    modeler.add_component_and_named_selection("NACA", airfoil_sketches, "Airfoils")
+    modeler.add_component("NACA", airfoil_sketches)
 
-    # --- Ring with cuts --- #
-
-    ring_sketch = SketchController("Ring")
-    ring_sketch.add_ring(center, radius, spread)
-
-    modeler.add_component_and_named_selection("Ring", ring_sketch, "Ring")
-    modeler.cut("Ring", "NACA")
-
-    # --- Inner circle --- #
-
-    inner_radius = Distance(radius.value.m - spread.value.m / 2.0)
-    inner_circle_sketch = SketchController("Inner Circle")
-    inner_circle_sketch.add_circle(center, inner_radius)
-
-    modeler.add_component_and_named_selection("Inner Circle", inner_circle_sketch, "Inner Circle")
-
-    # --- Environment -- #
+    # --- Env --- #
 
     env_sketch = SketchController("Env")
     env_sketch.add_env()
 
-    modeler.add_component_and_named_selection("Env", env_sketch, "Env")
+    modeler.add_component("Env", env_sketch)
+    modeler.add_named_selection("Env", "fluid-1")
     modeler.cut("Env", "Inner Circle")
     modeler.cut("Env", "Ring")
-    modeler.cut("Env", "NACA")
 
-    # --- Boy of influence --- #
+    # --- Create named selections: wall, inlet, outlet
+    modeler.add_inlet_and_outlet()
+    modeler.add_wall()
 
+    # --- Body of influence --- #
     boi_sketch = SketchController("BoI")
     boi_sketch.add_boi(center)
 
-    modeler.add_component_and_named_selection("BoI", boi_sketch, "BoI")
+    modeler.add_component("BoI", boi_sketch)
+    modeler.add_named_selection("BoI", "boi")
+
+    # --- Remove NACA --- #
+    modeler.delete_component("NACA")
+
 
     # -- Plot in Discovery -- #
     modeler.save(file_name)
