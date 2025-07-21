@@ -22,7 +22,7 @@ def main():
     radius = Distance(5)
     angle_of_attack_deg = Angle(90.0)
     spread = Distance(0.4)
-    model_type = "3D"  # "2D" pr "3D"
+    model_type = "2D"  # "2D" pr "3D"
     file_name = f"model_{model_type}"
 
     modeler = ModelerController("Wind_Turbine", model_type)

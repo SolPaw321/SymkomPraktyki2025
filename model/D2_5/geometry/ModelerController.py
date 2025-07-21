@@ -95,12 +95,16 @@ class ModelerController:
         inlet_: list[Face] | list[Edge] = []
         outlet_: list[Face] | list[Edge] = []
         for element in env_:
-            element_value = element.normal().x if self._model_type == "3D" else element.start.x
-
-            if element_value < 0:
-                inlet_.append(element)
-            elif element_value > 0:
-                outlet_.append(element)
+            if self._model_type == "3D":
+                if element.normal().x < 0:
+                    inlet_.append(element)
+                else:
+                    outlet_.append(element)
+            else:
+                if element.start.x < 0 and element.end.x < 0:
+                    inlet_.append(element)
+                else:
+                    outlet_.append(element)
 
         if self._model_type == "3D":
             self._design.create_named_selection("inlet", faces=inlet_)
