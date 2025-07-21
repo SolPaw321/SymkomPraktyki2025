@@ -98,12 +98,12 @@ class ModelerController:
             if self._model_type == "3D":
                 if element.normal().x < 0:
                     inlet_.append(element)
-                else:
+                elif element.normal().x > 0:
                     outlet_.append(element)
             else:
                 if element.start.x < 0 and element.end.x < 0:
                     inlet_.append(element)
-                else:
+                elif element.start.x > 0 and element.end.x > 0:
                     outlet_.append(element)
 
         if self._model_type == "3D":
