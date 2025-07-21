@@ -1,3 +1,7 @@
+# Uwagi
+PyGeometry 0.11.0 i PyPrmieMesh 0.9.0 działają na innych wersjach google.protobuf. PyGeometry 0.11.0 działa dla protobuf<6.0dev,>=5.26.1, natomiast PyPrimeMesh 0.9.0 działa dla protobuf<5,>=3.19.
+
+
 # Temat: Modelowanie turbin wiatrowych
 
 Cel: opracowanie szczegółowego tutorialu w formie prezentacji PowerPoint ukazującego proces przygotowywania geometrii, siatkowania i prowadzenia symulacji wariantowych na przykładzie turbiny wiatrowej o pionowej osi obrotu w środowisku PyAnsys, celem przeprowadzenia obliczeń w sposób zautomatyzowany.
