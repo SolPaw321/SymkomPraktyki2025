@@ -47,7 +47,7 @@ class SketchController:
             center (Point2D): center of circle, default=Point2D([0, 0])
             radius (Distance): radius of circle, default=Distance(1)
         """
-        start = Point2D([radius.value.m, 0])
+        start = Point2D([0, radius.value.m])
         self.sketch.arc_from_start_center_and_angle(start, center, Angle(360))
 
     def add_ring(self, center: Point2D,
