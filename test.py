@@ -1,8 +1,5 @@
-from beartype import beartype as check_input_types
+from ansys.geometry.core.designer.face import Face
+from ansys.geometry.core.designer.edge import Edge
 
-@check_input_types
-def f(x: int):
-    print(x)
-
-
-f(432.0)
+help(Edge.vertices[0])
+print(type(Edge.vertices[0]))

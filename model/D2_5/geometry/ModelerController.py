@@ -4,6 +4,8 @@ from model.D2_5.geometry.misc.PATHS import RESULTS
 from ansys.geometry.core.designer.component import Component
 from ansys.geometry.core.sketch import Sketch
 from ansys.geometry.core.misc import Distance
+from ansys.geometry.core.designer.face import Face
+from ansys.geometry.core.designer.edge import Edge
 
 
 class ModelerController:
@@ -11,11 +13,12 @@ class ModelerController:
     ModelerController is a class for create, run and save modeler environment (Discovery).
     """
 
-    def __init__(self, design_name: str):
+    def __init__(self, design_name: str, model_type: str):
         self.modeler = launch_modeler(mode="Discovery", **{"timeout": 500})
         print(self.modeler)
 
         self._design_name = design_name
+        self._model_type = model_type.upper()
         self._design = self.modeler.create_design(self._design_name)
 
         self._components: dict[str, Component] = dict()
@@ -38,6 +41,12 @@ class ModelerController:
         """
         return self._sketches
 
+    def __extrude(self, component: Component, name: str, sketch: Sketch):
+        if self._model_type == "3D":
+            component.extrude_sketch(name, sketch, self._distance)
+        else:
+            component.create_surface(name, sketch)
+
     def add_component(self, component_name: str,
                       sketch_controllers: list[SketchController] | SketchController):
         """
@@ -56,7 +65,7 @@ class ModelerController:
         sketches = []
         for sketch_controller in sketch_controllers:
             name, sketch = sketch_controller.get()
-            component.extrude_sketch(name, sketch, self._distance)
+            self.__extrude(component, name, sketch)
 
             sketches.append(sketch)
 
@@ -79,18 +88,26 @@ class ModelerController:
     def add_inlet_and_outlet(self):
         env_component = self._components["Env"]
 
-        env_faces = env_component.bodies[0].faces
+        env_body = env_component.bodies[0]
 
-        inlet_faces = []
-        outlet_faces = []
-        for face in env_faces:
-            if face.normal().x < 0:
-                inlet_faces.append(face)
-            elif face.normal().x > 0:
-                outlet_faces.append(face)
+        env_: list[Face] | list[Edge] = env_body.faces if self._model_type == "3D" else env_body.edges
 
-        self._design.create_named_selection("inlet", faces=inlet_faces)
-        self._design.create_named_selection("outlet", faces=outlet_faces)
+        inlet_: list[Face] | list[Edge] = []
+        outlet_: list[Face] | list[Edge] = []
+        for element in env_:
+            element_value = element.normal().x if self._model_type == "3D" else element.start.x
+
+            if element_value < 0:
+                inlet_.append(element)
+            elif element_value > 0:
+                outlet_.append(element)
+
+        if self._model_type == "3D":
+            self._design.create_named_selection("inlet", faces=inlet_)
+            self._design.create_named_selection("outlet", faces=outlet_)
+        else:
+            self._design.create_named_selection("inlet", edges=inlet_)
+            self._design.create_named_selection("outlet", edges=outlet_)
 
     def add_wall(self):
         """
@@ -100,14 +117,20 @@ class ModelerController:
         ring_component = self._components["Ring"]
 
         ring_body = ring_component.bodies[0]
-        ring_faces_id = [face.id for face in ring_body.faces]
 
-        for airfoil_body in airfoil_component.bodies:
-            ring_body.subtract(airfoil_body, keep_other=True)
+        ring_elements_old = ring_body.faces if self._model_type == "3D" else ring_body.edges
+        ring_element_id = [element.id for element in ring_elements_old]
 
-        wall_faces = [face for face in ring_body.faces if face.id not in ring_faces_id]
+        ring_body.subtract(airfoil_component.bodies, keep_other=True)
 
-        self._design.create_named_selection("wall", faces=wall_faces)
+        ring_elements_new = ring_body.faces if self._model_type == "3D" else ring_body.edges
+
+        wall_: list[Face] | list[Edge] = [element for element in ring_elements_new if element.id not in ring_element_id]
+
+        if self._model_type == "3D":
+            self._design.create_named_selection("wall", faces=wall_)
+        else:
+            self._design.create_named_selection("wall", edges=wall_)
 
     def cut(self, cake_name: str,
             knife_name: str):
@@ -119,10 +142,11 @@ class ModelerController:
             knife_name (str): name of cutting sketch
         """
         base_component = self._components[cake_name]
-        cutter_sketches = self._sketches[knife_name]
+        cutter_component = self._components[knife_name]
 
-        for i in range(len(cutter_sketches)):
-            base_component.extrude_sketch(f"cut_{i + 1}", cutter_sketches[i], self._distance, cut=True)
+        base_bodies = base_component.bodies
+        for base_body in base_bodies:
+            base_body.subtract(cutter_component.bodies, keep_other=True)
 
     def delete_component(self, component_name: str):
         """

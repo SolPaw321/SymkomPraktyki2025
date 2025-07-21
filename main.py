@@ -15,16 +15,17 @@ def main():
     DEFAULT_UNITS.LENGTH = UNITS.millimeter  # not working for sketch.plot()
     DEFAULT_UNITS.ANGLE = UNITS.degree
 
-    # --- PARAMETERS --- #
+    # --- USER PARAMETERS --- #
     n_airfoils = 3
     naca_code = "0012"
     center = Point2D([0, 0])
     radius = Distance(5)
     angle_of_attack_deg = Angle(90.0)
     spread = Distance(0.4)
-    file_name = "model"
+    model_type = "3D"  # "2D" pr "3D"
+    file_name = f"model_{model_type}"
 
-    modeler = ModelerController("Wind Turbine")
+    modeler = ModelerController("Wind_Turbine", model_type)
     # --- Ring without cuts --- #
 
     ring_sketch = SketchController("Ring")
@@ -36,11 +37,11 @@ def main():
     # --- Inner circle --- #
 
     inner_radius = Distance(radius.value.m - spread.value.m / 2.0)
-    inner_circle_sketch = SketchController("Inner Circle")
-    inner_circle_sketch.add_circle(center, inner_radius)
+    inner_circle_sketch = SketchController("InnerCircle")
+    inner_circle_sketch.add_circle_using_arc(center, inner_radius)
 
-    modeler.add_component("Inner Circle", inner_circle_sketch)
-    modeler.add_named_selection("Inner Circle", "fluid-3")
+    modeler.add_component("InnerCircle", inner_circle_sketch)
+    modeler.add_named_selection("InnerCircle", "fluid-3")
 
     # --- Airfoils --- #
     airfoil_sketches = []
@@ -58,14 +59,14 @@ def main():
     modeler.add_component("NACA", airfoil_sketches)
 
     # --- Env --- #
-
     env_sketch = SketchController("Env")
-    env_sketch.add_env()
+    outer_radius = Distance(radius.value.m + spread.value.m / 2.0)
+    env_sketch.add_env(center, outer_radius)
 
     modeler.add_component("Env", env_sketch)
     modeler.add_named_selection("Env", "fluid-1")
-    modeler.cut("Env", "Inner Circle")
-    modeler.cut("Env", "Ring")
+    # modeler.cut("Env", "InnerCircle")
+    # modeler.cut("Env", "Ring")
 
     # --- Create named selections: wall, inlet, outlet
     modeler.add_inlet_and_outlet()
@@ -80,7 +81,6 @@ def main():
 
     # --- Remove NACA --- #
     modeler.delete_component("NACA")
-
 
     # -- Plot in Discovery -- #
     modeler.save(file_name)

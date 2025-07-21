@@ -80,7 +80,8 @@ class SketchController:
             self.sketch.segment(points[i], points[i + 1])
         self.sketch.segment(points[-1], points[0])
 
-    def add_env(self):
+    def add_env(self, center: Point2D,
+                radius: Distance):
         """
         Add environment (the rest of world).
         """
@@ -97,6 +98,8 @@ class SketchController:
             .segment_to_point(corners[2]).segment_to_point(corners[3])
             .segment_to_point(corners[0])
         )
+
+        self.add_circle_using_arc(center, radius)
 
     def add_boi(self, center: Point2D):
         """
