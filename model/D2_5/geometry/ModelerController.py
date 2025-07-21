@@ -148,7 +148,7 @@ class ModelerController:
         Args:
             file_name (str): name of your file
         """
-        self._design.export_to_scdocx(RESULTS / file_name)
+        self._design.export_to_step(RESULTS / file_name)
         print(f"File exported to: {RESULTS / file_name}")
 
     def close(self):
