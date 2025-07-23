@@ -25,48 +25,41 @@ print(model)
 
 
 #--------------------------# 2d
+
+
 mesh_util = prime.lucid.Mesh(model=model)
 
+mesh_util.surface_mesh(min_size=0.2, max_size=5)
 
-
-
-size_control = model.control_data.create_size_control(prime.SizingType.CURVATURE)
-size_control.set_curvature_sizing_params(
-    prime.CurvatureSizingParams(model=model, min=0.2, max=2.0, growth_rate=1.2)
+mesh_util.volume_mesh(
+    volume_fill_type=prime.VolumeFillType.TET,
+    prism_surface_expression="* !inlet !outlet",
+    prism_layers=4,
 )
-size_control.set_suggested_name("curv_control")
-size_control.set_scope(prime.ScopeDefinition(model=model))
+
+
+pl = PrimePlotter()
+pl.plot(model, update=True)
+pl.show()
 
 
 
 
-size_control = model.control_data.create_size_control(prime.SizingType.PROXIMITY)
-size_control.set_proximity_sizing_params(
-    prime.ProximitySizingParams(
-        model=model,
-        min=0.1,
-        max=2.0,
-        growth_rate=1.2,
-        elements_per_gap=3.0,
-        ignore_orientation=True,
-        ignore_self_proximity=False,
-    )
-)
-size_control.set_suggested_name("prox_control")
-size_control.set_scope(prime.ScopeDefinition(model=model))
 
 
 
+# size_control = model.control_data.create_size_control(prime.SizingType.BOI)
+# size_control.set_boi_sizing_params(
+#     prime.BoiSizingParams(model=model, max=20.0, growth_rate=1.2)
+# )
+# size_control.set_suggested_name("BOI_control")
+# size_control.set_scope(prime.ScopeDefinition(model=model))
+#
+#
+# mesh_util.surface_mesh_with_size_controls(size_control_names=("BOI_control"))
 
-size_control = model.control_data.create_size_control(prime.SizingType.BOI)
-size_control.set_boi_sizing_params(
-    prime.BoiSizingParams(model=model, max=20.0, growth_rate=1.2)
-)
-size_control.set_suggested_name("BOI_control")
-size_control.set_scope(prime.ScopeDefinition(model=model))
 
 
-mesh_util.surface_mesh_with_size_controls(size_control_names=("BOI_control"))
 #-----------------------# 3d
 
 
