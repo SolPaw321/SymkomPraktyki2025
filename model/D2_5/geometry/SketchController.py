@@ -1,7 +1,9 @@
 from ansys.geometry.core.sketch import Sketch
-from ansys.geometry.core.math import Point2D
+from ansys.geometry.core.math import Point2D, Point3D
 from ansys.geometry.core.misc import Distance, Angle
 from numpy import array
+from model.D2_5.geometry.Airfoil import Airfoil
+from model.D2_5.geometry.misc.points import *
 
 
 class SketchController:
@@ -79,6 +81,24 @@ class SketchController:
         for i in range(len(points) - 1):
             self.sketch.segment(points[i], points[i + 1])
         self.sketch.segment(points[-1], points[0])
+
+    def add_airfoils_by_sketch(self, naca_code: str | int,
+                               n_airfoils: int,
+                               center: Point2D,
+                               radius: Distance,
+                               angle_of_attack_deg: Angle):
+        airfoil_sketches = []
+        for i in range(n_airfoils):
+            sketch = SketchController(f"NACA_airfoil_{i + 1}")
+
+            angle = Angle(360.0 * i / n_airfoils)
+            foil = Airfoil(naca_code)
+            foil.generate_points()
+            placed_foil = translate_airfoil_on_circle(foil, center, radius, angle, angle_of_attack_deg)
+            sketch.add_points(placed_foil.points)
+
+            airfoil_sketches.append(sketch)
+        return airfoil_sketches
 
     def add_env(self, center: Point2D,
                 radius: Distance):

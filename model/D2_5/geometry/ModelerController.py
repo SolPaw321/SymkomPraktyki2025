@@ -2,10 +2,14 @@ from ansys.geometry.core import launch_modeler
 from model.D2_5.geometry.SketchController import SketchController
 from model.D2_5.geometry.misc.PATHS import RESULTS
 from ansys.geometry.core.designer.component import Component
+from ansys.geometry.core.designer import Body
 from ansys.geometry.core.sketch import Sketch
-from ansys.geometry.core.misc import Distance
+from ansys.geometry.core.misc import Distance, Angle
 from ansys.geometry.core.designer.face import Face
 from ansys.geometry.core.designer.edge import Edge
+from model.D2_5.geometry.misc.PATHS import AIRFOIL_MODEL
+from ansys.geometry.core.math import Point2D, Point3D, UnitVector3D, Vector3D
+from numpy.linalg import norm
 
 
 class ModelerController:
@@ -13,18 +17,27 @@ class ModelerController:
     ModelerController is a class for create, run and save modeler environment (Discovery).
     """
 
-    def __init__(self, design_name: str, model_type: str):
+    def __init__(self, design_name: str, model_type: str, launch_airfoil_from_file: bool):
         self.modeler = launch_modeler(mode="Discovery", **{"timeout": 500})
         print(self.modeler)
 
         self._design_name = design_name
         self._model_type = model_type.upper()
-        self._design = self.modeler.create_design(self._design_name)
+        self._launch_airfoil_from_file =launch_airfoil_from_file
+        self._design = self.__design()
 
         self._components: dict[str, Component] = dict()
         self._sketches: dict[str, list[Sketch]] = dict()
 
         self._distance = Distance(0.1)
+
+    def __design(self):
+        if self._launch_airfoil_from_file:
+            if self._model_type == "3D":
+                print("Model type: 2D")
+            self._model_type = "2D"
+            return None
+        return self.modeler.create_design(self._design_name)
 
     @property
     def components(self) -> dict[str, Component]:
@@ -86,7 +99,7 @@ class ModelerController:
         self._design.create_named_selection(named_selection_name, bodies=component.bodies)
 
     def add_inlet_and_outlet(self):
-        env_component = self._components["Env"]
+        env_component = self._components["fluid-1"]
 
         env_body = env_component.bodies[0]
 
@@ -118,7 +131,7 @@ class ModelerController:
         This method subtracts NACA airfoil from ring and creates named selection ''wall''.
         """
         airfoil_component = self._components["NACA"]
-        ring_component = self._components["Ring"]
+        ring_component = self._components["fluid-2"]
 
         ring_body = ring_component.bodies[0]
 
@@ -159,9 +172,66 @@ class ModelerController:
         Args:
             component_name (str): Component name
         """
-        self._design.delete_component(self._components[component_name])
-        self._components.pop(component_name)
-        self._sketches.pop(component_name)
+        if component_name == "NACA":
+            self._design.delete_component(self._components["NACA"])
+            self._components.pop("NACA")
+        else:
+            self._design.delete_component(self._components[component_name])
+            self._components.pop(component_name)
+            self._sketches.pop(component_name)
+
+    def load_airfoils(self, center: Point2D,
+                      radius: Distance,
+                      angle_of_attack_deg: Angle,
+                      n_airfoils: int):
+        center = Point3D([center.x.m, center.y.m, 0])
+
+        self._design = self.modeler.open_file(AIRFOIL_MODEL)
+        self._design.set_name = self._design_name
+
+        # self._design.components[0].set_name = "NACA"
+        component = self._design.components[0]
+        component.set_name = "NACA"
+        self._components["NACA"] = component
+        airfoil = component.bodies[0]
+        airfoil.scale(0.1)
+
+        airfoil_center = self.__find_center_of_airfoil(airfoil)
+        unit_vector = UnitVector3D(-1 * airfoil_center.position)
+        distance = norm(airfoil_center.position)
+        airfoil.translate(unit_vector, distance)
+
+        airfoil.rotate(center, UnitVector3D([0, 0, 1]), angle_of_attack_deg)
+
+        radius_float = radius.value.m
+        airfoil.translate(
+            UnitVector3D(Vector3D([radius_float, 0, 0])),
+            radius
+        )
+
+        for i in range(n_airfoils):
+            if i == 0:
+                airfoil_copy = airfoil
+                airfoil_copy.set_name = f"Airfoil_{i}"
+            else:
+                airfoil_copy = airfoil.copy(component, f"Airfoil_{i}")
+
+            angle = Angle(i * 360.0 / n_airfoils)
+            airfoil_copy.rotate(center, UnitVector3D([0, 0, 1]), angle)
+
+    @staticmethod
+    def __find_center_of_airfoil(airfoil: Body):
+        airfoil_vertices = airfoil.vertices
+
+        leading_edge = airfoil_vertices[0]
+        trailing_edge = airfoil_vertices[0]
+        for vertex in airfoil_vertices:
+            if vertex.x < leading_edge.x:
+                leading_edge = vertex
+            elif vertex.x > trailing_edge.x:
+                trailing_edge = vertex
+
+        return (leading_edge + trailing_edge) / 2
 
     def plot(self):
         """

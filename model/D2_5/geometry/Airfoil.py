@@ -111,6 +111,7 @@ class Airfoil:
             # Remove the first point since it is repeated
             if i == 0:
                 self._points.pop(0)
+        self._points.append(self._points[0])
         return self._points
 
     @property

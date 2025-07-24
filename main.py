@@ -1,6 +1,5 @@
 from model.D2_5.geometry.SketchController import SketchController
 from model.D2_5.geometry.ModelerController import ModelerController
-from model.D2_5.geometry.misc.points import *
 from ansys.geometry.core.math import Point2D
 from ansys.geometry.core.misc import UNITS, Distance, Angle
 from ansys.geometry.core.misc.measurements import DEFAULT_UNITS
@@ -21,30 +20,14 @@ def main():
     center = Point2D([0, 0])
     radius = Distance(5)
     angle_of_attack_deg = Angle(90.0)
-    spread = Distance(0.4)
+    spread = Distance(1)
     model_type = "2D"  # "2D" pr "3D"
     file_name = f"model_{model_type}"
 
-    modeler = ModelerController("Wind_Turbine", model_type)
-    # --- Ring without cuts --- #
-
-    ring_sketch = SketchController("Ring")
-    ring_sketch.add_ring(center, radius, spread)
-
-    modeler.add_component("Ring", ring_sketch)
-    modeler.add_named_selection("Ring", "fluid-2")
-
-    # --- Inner circle --- #
-
-    inner_radius = Distance(radius.value.m - spread.value.m / 2.0)
-    inner_circle_sketch = SketchController("InnerCircle")
-    inner_circle_sketch.add_circle_using_arc(center, inner_radius)
-
-    modeler.add_component("InnerCircle", inner_circle_sketch)
-    modeler.add_named_selection("InnerCircle", "fluid-3")
+    modeler = ModelerController("Wind_Turbine", model_type, True)
 
     # --- Airfoils --- #
-    airfoil_sketches = []
+    '''airfoil_sketches = []
     for i in range(n_airfoils):
         sketch = SketchController(f"NACA_airfoil_{i+1}")
 
@@ -54,17 +37,35 @@ def main():
         placed_foil = translate_airfoil_on_circle(foil, center, radius, angle, angle_of_attack_deg)
         sketch.add_points(placed_foil.points)
 
-        airfoil_sketches.append(sketch)
+        airfoil_sketches.append(sketch)'''
+    modeler.load_airfoils(center, radius, angle_of_attack_deg, n_airfoils)
 
-    modeler.add_component("NACA", airfoil_sketches)
+    #modeler.add_component("NACA", airfoil_sketches)
+
+    # --- Ring without cuts --- #
+
+    ring_sketch = SketchController("fluid-2")
+    ring_sketch.add_ring(center, radius, spread)
+
+    modeler.add_component("fluid-2", ring_sketch)
+    modeler.add_named_selection("fluid-2", "fluid-2")
+
+    # --- Inner circle --- #
+
+    inner_radius = Distance(radius.value.m - spread.value.m / 2.0)
+    inner_circle_sketch = SketchController("fluid-3")
+    inner_circle_sketch.add_circle_using_arc(center, inner_radius)
+
+    modeler.add_component("fluid-3", inner_circle_sketch)
+    modeler.add_named_selection("fluid-3", "fluid-3")
 
     # --- Env --- #
-    env_sketch = SketchController("Env")
+    env_sketch = SketchController("fluid-1")
     outer_radius = Distance(radius.value.m + spread.value.m / 2.0)
     env_sketch.add_env(center, outer_radius)
 
-    modeler.add_component("Env", env_sketch)
-    modeler.add_named_selection("Env", "fluid-1")
+    modeler.add_component("fluid-1", env_sketch)
+    modeler.add_named_selection("fluid-1", "fluid-1")
     # modeler.cut("Env", "InnerCircle")
     # modeler.cut("Env", "Ring")
 

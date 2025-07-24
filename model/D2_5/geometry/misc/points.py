@@ -78,3 +78,4 @@ def translate_airfoil_on_circle(foil: Airfoil,
     foil.points = translated
 
     return foil
+
