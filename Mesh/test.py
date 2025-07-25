@@ -3,6 +3,7 @@ import tempfile
 import ansys.meshing.prime as prime
 from ansys.meshing.prime.graphics.plotter import PrimePlotter
 
+from SymkomPraktyki2025.Mesh.Control_data import surfer_params
 
 # 1. Uruchomienie klienta
 client = prime.launch_prime(prime_root=r"C:\Program Files\ANSYS Inc\v251\meshing\Prime")
@@ -42,11 +43,9 @@ print(model)
 
 
 # Set the global sizing parameters after importing the model
-
 model.set_global_sizing_params(
     prime.GlobalSizingParams(model=model, min=1, max=12, growth_rate=1.1)
 )
-
 model.delete_volumetric_size_fields(model.get_active_volumetric_size_fields())
 part = model.parts[0]
 
@@ -55,7 +54,7 @@ part = model.parts[0]
 
 sweeper = prime.VolumeSweeper(model)
 stacker_params = prime.MeshStackerParams(
-    model=model, direction=[0.0, 0.0, 1.0], max_offset_size=10, delete_base=True
+    model=model, direction=[0.0, 0.0, 1.0], max_offset_size=5, delete_base=True
 )
 
 print(stacker_params)
@@ -77,16 +76,15 @@ res = size_field.compute_volumetric(
     size_control_ids=createbase_results.size_control_ids,
     volumetric_sizefield_params=prime.VolumetricSizeFieldComputeParams(model),
 )
+
 surfer_params = prime.SurferParams(
-    model=model, size_field_type=prime.SizeFieldType.VOLUMETRIC, generate_quads=True
+    model=model, size_field_type=prime.SizeFieldType.VOLUMETRIC, generate_quads=True, project_on_geometry=True,
 )
 meshbase_result = prime.Surfer(model).mesh_topo_faces(
     part_id=part.id, topo_faces=base_faces, params=surfer_params
 )
 
-print(surfer_params)
-# - model=powierzchnia z profilami
-# - BOI
+
 
 
 
