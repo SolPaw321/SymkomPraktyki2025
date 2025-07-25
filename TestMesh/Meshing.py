@@ -33,9 +33,9 @@ class Meshing(Client):
 
     def create_surfer(self):
         raise NotImplemented("")
-        #surfer_params = prime.SurferParams(model=self._model, constant_size=1.0)
+        # surfer_params = prime.SurferParams(model=self._model, constant_size=1.0)
         #surfer_result = prime.Surfer(self._model).mesh_topo_faces(
-        #    self._model.id
+        #    part.id, topo_faces=part.get_topo_faces(), params=surfer_params
         #)
 
     def create_size_control(self, type_: str):
@@ -70,6 +70,12 @@ class Meshing(Client):
             raise NotImplemented("")
 
         size_control.set_scope(prime.ScopeDefinition(self._model))
+
+    def create_surface_mesh(self):
+        raise NotImplemented("")
+
+    def get_all_parts(self):
+        print(part.name for part in self._model.parts)
 
     def plot(self):
         display = PrimePlotter()
