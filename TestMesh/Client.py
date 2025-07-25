@@ -16,9 +16,9 @@ class Client:
         #return prime.Client(ip="127.0.0.1", port=50055)
         return prime.launch_prime(
             prime_root=ANSYS_Prime,
-            ip="79.188.195.106",
-            port=1055,
-            n_procs=2,
+            #ip="79.188.195.106",
+            #port=1055,
+            #n_procs=2,
             timeout=120
         )
 
