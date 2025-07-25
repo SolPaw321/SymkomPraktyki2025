@@ -1,4 +1,4 @@
-from TestMesh.Meshing import Meshing
+from Meshing import Meshing
 
 
 meshing = Meshing()
