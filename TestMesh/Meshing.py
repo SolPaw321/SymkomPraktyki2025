@@ -18,11 +18,11 @@ class Meshing(Client):
     def __mesh_util(self):
         mesh_util = prime.lucid.Mesh(model=self._model)
         print("Reading...")
-        mesh_util.read(file_name=str(Model_stp_file), cad_reader_route=prime.CadReaderRoute.DISCOVERY)
-        #file_io = prime.FileIO(model=self._model)
-        #params = prime.ImportCadParams(model=self._model)
-        #results = file_io.import_cad(str(Model_stp_file), params=params)
-        #print(results)
+        # mesh_util.read(file_name=str(Model_stp_file), cad_reader_route=prime.CadReaderRoute.DISCOVERY)
+        file_io = prime.FileIO(model=self._model)
+        params = prime.ImportCadParams(model=self._model)
+        results = file_io.import_cad(str(Model_stp_file), params=params)
+        print(results)
 
         mesh_util.surface_mesh(min_size=5, max_size=20)
 
