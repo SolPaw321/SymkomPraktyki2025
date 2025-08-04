@@ -2,7 +2,7 @@ from ansys.geometry.core import launch_modeler
 from Geometry.SketchController import SketchController
 from Geometry.misc.PATHS import RESULTS
 from ansys.geometry.core.designer.component import Component
-from ansys.geometry.core.designer import Body, Design
+from ansys.geometry.core.designer import Body, Design, SharedTopologyType
 from ansys.geometry.core.sketch import Sketch
 from ansys.geometry.core.misc import Distance, Angle
 from ansys.geometry.core.designer.face import Face
@@ -10,6 +10,7 @@ from ansys.geometry.core.designer.edge import Edge
 from Geometry.misc.PATHS import AIRFOIL_MODEL_2D, AIRFOIL_MODEL_3D
 from ansys.geometry.core.math import Point2D, Point3D, UnitVector3D, Vector3D
 from numpy.linalg import norm
+from ansys.geometry.core.tools.prepare_tools import PrepareTools
 
 
 class ModelerController:
@@ -19,6 +20,7 @@ class ModelerController:
     """
 
     def __init__(self, design_name: str, model_type: str, launch_airfoil_from_file: bool):
+        self.__validate_model_type(model_type)
         self.modeler = launch_modeler(mode="Discovery", **{"timeout": 500})
         print(self.modeler)
 
@@ -30,8 +32,16 @@ class ModelerController:
         self._components: dict[str, Component] = dict()
         self._sketches: dict[str, list[Sketch]] = dict()
 
-        self._distance = Distance(0.1) if self._model_type == "3D" else Distance(0)
-        self._wall_ids = None
+        self._distance = Distance(1) if self._model_type == "3D" else Distance(0)
+
+    @staticmethod
+    def __validate_model_type(model_type: str):
+        """
+        Validate model_type.
+
+        """
+        if model_type.upper() not in ("2D", "3D"):
+            raise ValueError(f"model type should be 2D or 3D")
 
     def __design(self) -> Design | None:
         """
@@ -39,7 +49,6 @@ class ModelerController:
 
         Returns:
              Design: the initialized design
-             None: ???
         """
         if self._launch_airfoil_from_file:
             return None
@@ -123,27 +132,22 @@ class ModelerController:
         component = self._components[component_name]
         self._design.create_named_selection(named_selection_name, bodies=component.bodies)
 
-    def add_walls_named_selection(self,
-                                  ring_name: str):
-        ring_component = self._components[ring_name]
+    def add_symmetry_named_selection(self):
+        if self._model_type != "3D":
+            raise NotImplementedError('symmetry not implemented for 2D')
 
-        ring_top_bottom_elements: list[Face | Edge] = []
-        ring_side_elements: list[Face | Edge] = []
+        symmetry_faces = []
+        for component in self._design.components:
+            for body in component.bodies:
+                if body.name not in ('boi', 'NACA'):
+                    for face in body.faces:
+                        try:
+                            if face.normal().z in (-1, 1) or face.normal().y in (-1, 1):
+                                symmetry_faces.append(face)
+                        except Exception as e:
+                            pass
 
-        elements = ring_component.bodies[0].faces if self._model_type == "3D" else ring_component.bodies[0].edges
-
-        if self._model_type == "3D":
-            for element in elements:
-                try:
-                    if element.normal().z == 1 or element.normal().z == -1:
-                        ring_top_bottom_elements.append(element)
-                    elif element.id not in self._wall_ids:
-                        ring_side_elements.append(element)
-                except Exception as e:
-                    pass
-
-            self._design.create_named_selection("walls", faces=ring_top_bottom_elements)
-            self._design.create_named_selection("side", faces=ring_side_elements)
+        self._design.create_named_selection('symmetry', faces=symmetry_faces)
 
     def add_inlet_and_outlet(self,
                              main_component_name: str):
@@ -167,9 +171,9 @@ class ModelerController:
             inlet_["faces"] = []
             outlet_["faces"] = []
             for element in env_:
-                if element.normal().x < 0:
+                if element.normal() == UnitVector3D([-1, 0, 0]):
                     inlet_["faces"].append(element)
-                elif element.normal().x > 0:
+                elif element.normal() == UnitVector3D([1, 0, 0]):
                     outlet_["faces"].append(element)
         else:
             inlet_['edges'] = []
@@ -212,13 +216,11 @@ class ModelerController:
         # pull out new elements, after subtract
         wall_: list[Face] | list[Edge] = [element for element in ring_elements_new if element.id not in ring_element_id]
 
-        # create neamed selection 'wall'
+        # create named selection 'wall'
         if self._model_type == "3D":
             self._design.create_named_selection("wall", faces=wall_)
         else:
             self._design.create_named_selection("wall", edges=wall_)
-
-        self._wall_ids = [wall.id for wall in wall_]
 
     def cut(self, cake_name: str,
             knife_name: str):
@@ -237,19 +239,6 @@ class ModelerController:
         base_bodies = base_component.bodies
         for base_body in base_bodies:
             base_body.subtract(cutter_component.bodies, keep_other=True)
-
-    def delete_component(self, component_name: str):
-        """
-        Delete Component from Design.
-
-        Args:
-            component_name (str): Component name
-        """
-        # delete the component, then pop from component and sketch dictionary
-        self._design.delete_component(self._components[component_name])
-        self._components.pop(component_name)
-        if component_name in self._sketches.keys():
-            self._sketches.pop(component_name)
 
     def load_airfoils(self,
                       file_name: str,
@@ -283,18 +272,21 @@ class ModelerController:
         self._design.set_name = self._design_name   # available in 25R2
         self._design.components[0].set_name = "NACA"  # available in 25R2
 
+        comp = self._design.add_component("NACA")
+        # self._design.delete_body()
+
         # get your Geometry as component and add to components dictionary
         component = self._design.components[0]
         self._components["NACA"] = component
         component.set_name = "NACA"  # available in 25R2
 
-        # get your Geometry as body and scale
+        # get your geometry as a body and scale
         airfoil = component.bodies[0]
-        airfoil.scale(10)  # 0.1
+        airfoil.scale(10)
+
         if self._model_type == "3D":
             airfoil_vertices_z = [vertex.z.m for vertex in airfoil.vertices]
             self._distance = Distance(max(airfoil_vertices_z) - min(airfoil_vertices_z))
-            print(f"Distance 3d, modelercontroler load_aifroil_from-file: {self._distance}")
 
         # find the geometric center of your Geometry and translate it to the coordinate system center
         airfoil_center = self.__find_center_of_airfoil(airfoil)
@@ -347,6 +339,18 @@ class ModelerController:
         # divide by number of vertices and return results
         return sum_ / len(airfoil_vertices)
 
+    def share_topology(self):
+        """
+        Share topology between fluid bodies.
+
+        """
+        components = [comp for comp in self._design.components if comp.name in ('fluid-1', 'fluid-2', 'fluid-3')]
+        bodies = []
+        for comp in components:
+            bodies.append(comp.bodies[0])
+
+        self.modeler.prepare_tools.share_topology([body for body in bodies])
+
     def plot(self):
         """
         Plot the design.
@@ -361,55 +365,13 @@ class ModelerController:
         Args:
             file_name (str): name of your file
         """
-        try:
-            self._design.export_to_scdocx(RESULTS / file_name)
-        except Exception as e:
-            print("scdoxc")
-            print(e)
+        print("Exporting to disco...")
+        self._design.export_to_fmd(RESULTS / file_name)
 
-        try:
-            self._design.export_to_fmd(RESULTS / file_name)
-        except Exception as e:
-            print("fmd")
-            print(e)
+        print("Exporting to fmd...")
+        self._design.export_to_disco(RESULTS / file_name)
 
-        try:
-            self._design.export_to_disco(RESULTS / file_name)
-        except Exception as e:
-            print("disco")
-            print(e)
-
-        try:
-            self._design.export_to_pmdb(RESULTS / file_name)
-        except Exception as e:
-            print("pmbd")
-            print(e)
-
-        try:
-            self._design.export_to_step(RESULTS / file_name)
-        except Exception as e:
-            print("step")
-            print(e)
-
-        try:
-            self._design.export_to_parasolid_bin(RESULTS / file_name)
-        except Exception as e:
-            print("parasolid_bin")
-            print(e)
-
-        try:
-            self._design.export_to_parasolid_text(RESULTS / file_name)
-        except Exception as e:
-            print("parasolid_text")
-            print(e)
-
-        try:
-            self._design.export_to_stride(RESULTS / file_name)
-        except Exception as e:
-            print("stride")
-            print(e)
-
-        print(f"File exported to: {RESULTS / file_name}")
+        print(f"Files exported to: {RESULTS / file_name}")
 
     def close(self):
         """
@@ -417,3 +379,12 @@ class ModelerController:
 
         """
         self.modeler.close()
+
+    def delete_unnecessary_components(self):
+        """
+        Delete unnecessary components from design, like NACA profiles.
+
+        """
+        for comp in self._design.components:
+            if comp.name not in ("fluid-1", "fluid-2", "fluid-3", "boi"):
+                self._design.delete_component(component=comp)

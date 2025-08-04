@@ -27,22 +27,6 @@ class SketchController:
         if not all(isinstance(x, Point2D) for x in points):
             raise TypeError(f"\'points\' list should contains Points2D")
 
-    def add_circle(self, center: Point2D,
-                   radius: Distance | float | int) -> Sketch:
-        """
-        Add a circle to the sketch.
-
-        Args:
-            center (Point2D): center of circle, default=Point2D([0, 0])
-            radius (Distance): radius of circle, default=Distance(1)
-        """
-        # validate input value and add circle to sketch
-        if isinstance(radius, float | int):
-            radius = Distance(radius)
-
-        # return results
-        return self.sketch.circle(center, radius)
-
     def add_circle_using_arc(self, center: Point2D,
                              radius: Distance | float | int):
         """

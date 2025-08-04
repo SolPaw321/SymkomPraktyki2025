@@ -1,4 +1,3 @@
-from beartype import beartype as check_input_types
 from ansys.geometry.core.math import Point2D
 from numpy import sin, cos, arctan, pi
 
@@ -7,7 +6,6 @@ class Airfoil:
     """
     Airfoil class description.
     """
-    @check_input_types
     def __init__(self, number: str | int, n_points: str | int = 200):
         self.__validate_number(number)
         self.__validate_n_points(n_points)
