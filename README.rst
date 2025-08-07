@@ -1,7 +1,8 @@
 # Instalacja
 Instalacja pakieru za pomocą:
 .. code:: bash
-   pip install git+https://github.com/SolPaw321/SymkomPraktyki2025.git
+
+    pip install ansys-geometry-core
 
 Anys PyGeometry w wersji 0.9.0:
 '''pip install ansys-geometry-core[all]==0.9.0'''
@@ -39,6 +40,7 @@ Symulacja we Fluencie powinna uwzględniąć analizę wariantową dla różnych:
  - prędkości obrotowych turbiny
 
 W prowadzonej analizie użytkownik powinien mieć wgląd w raporty z każdej symulacji ukazujące residua, moment i moc na turbinie, prędkość obrotową, bilans masy. Użytkownik powinien móc na bazie symulacji ocenić ich wiarygodność i przeprowadzić konieczny post-processing danych, z możliwością podglądu konturu modułu prędkości w domenie co n iteracji. Na dysku został zamieszczony przykładowy projekt turbiny 3D_3_mrf jako punkt odniesienia
+
 
 
 
