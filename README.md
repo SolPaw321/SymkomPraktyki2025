@@ -1,8 +1,8 @@
 # Instalacja
 Instalacja pakieru za pomocą:
-.. code:: bash
-
-    pip install ansys-geometry-core
+'''bash
+pip install ansys-geometry-core[all]==0.9.0
+'''
 
 Anys PyGeometry w wersji 0.9.0:
 '''pip install ansys-geometry-core[all]==0.9.0'''
