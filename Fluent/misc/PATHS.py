@@ -2,10 +2,10 @@ from pathlib import Path
 
 FLUENT = Path(__file__).resolve().parent.parent
 
-TESTMESH = FLUENT.parent / "Mesh"
+MESH = FLUENT.parent / "Mesh"
 
-MESH_3D = TESTMESH / 'results' / 'mesh_3d'
+MESH_3D = MESH / 'results' / 'mesh_3d'
 
-WORK_DIR = r"D:\Symkom_Project\Fluent\work_directiory"
+WORK_DIR = FLUENT / "work_directory"
 
 FLUENT_PATH = r"D:\ansys_student\ANSYS Inc\ANSYS Student\v252\fluent"
