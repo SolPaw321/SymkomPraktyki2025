@@ -1,6 +1,15 @@
-# Uwagi
-PyGeometry 0.11.0 i PyPrmieMesh 0.9.0 działają na innych wersjach google.protobuf. PyGeometry 0.11.0 działa dla protobuf<6.0dev,>=5.26.1, natomiast PyPrimeMesh 0.9.0 działa dla protobuf<5,>=3.19.
+# Instalacja
+Instalacja pakieru za pomocą:
+'''pip install git+'''
 
+Anys PyGeometry w wersji 0.9.0:
+'''pip install ansys-geometry-core[all]==0.9.0'''
+
+Ansys PyPrimeMesh w wersji 0.11.0:
+'''pip install ansys-meshing-prime[all]=0.11.0'''
+
+Ansys PyFluent w wersji 0.33.0:
+'''pip install ansys-fluent-core==0.33.0'''
 
 # Temat: Modelowanie turbin wiatrowych
 
@@ -30,5 +39,3 @@ Symulacja we Fluencie powinna uwzględniąć analizę wariantową dla różnych:
 
 W prowadzonej analizie użytkownik powinien mieć wgląd w raporty z każdej symulacji ukazujące residua, moment i moc na turbinie, prędkość obrotową, bilans masy. Użytkownik powinien móc na bazie symulacji ocenić ich wiarygodność i przeprowadzić konieczny post-processing danych, z możliwością podglądu konturu modułu prędkości w domenie co n iteracji. Na dysku został zamieszczony przykładowy projekt turbiny 3D_3_mrf jako punkt odniesienia
 
-# Użycie
-Poprać repozytorium i uruchomić plik main.py
