@@ -88,8 +88,8 @@ class MeshingParams:
             max_size=max_size if max_size else self._mesh_util_d_p.max_size
         )
 
-    @global_s_d_p.setter
-    def global_s_d_p(self,
+
+    def set_global_s_d_p(self,
                      min_: float | None = None,
                      max_: float | None = None,
                      growth_rate_: float | None = None):
@@ -107,8 +107,7 @@ class MeshingParams:
             growth_rate=growth_rate_ if growth_rate_ else self._global_s_d_p.growth_rate
         )
 
-    @curvature_s_d_p.setter
-    def curvature_s_d_p(self,
+    def set_curvature_s_d_p(self,
                         min_: float | None = None,
                         max_: float | None = None,
                         normal_angle_: float | None = None,
@@ -129,8 +128,7 @@ class MeshingParams:
             growth_rate=growth_rate_ if growth_rate_ else self._curvature_s_d_p.growth_rate
         )
 
-    @boi_s_d_p.setter
-    def boi_s_d_p(self,
+    def set_boi_s_d_p(self,
                   max_: float | None = None,
                   growth_rate_: float | None = None):
         """
@@ -145,8 +143,7 @@ class MeshingParams:
             growth_rate=growth_rate_ if growth_rate_ else self._boi_s_d_p.growth_rate
         )
 
-    @prism_d_p.setter
-    def prism_d_p(self,
+    def set_prism_d_p(self,
                   n_layers_: int | None = None,
                   first_height_: float | None = None,
                   growth_rate_: float | None = None):
