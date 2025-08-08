@@ -11,7 +11,7 @@ pip install ansys-meshing-prime[all]==0.9.0
 pip install ansys-fluent-core==0.33.0
 ```
 
-This project is working with 25R2 ANSYS env.
+This project is working with 25R2 ANSYS environment.
 
 # Important note before use
 The geometry allows for the generation of a vertical-axis wind turbine model in both 3D and 2D versions. Also, we do not recommend changing the names of components.
@@ -81,6 +81,7 @@ Currently supports only inlet velocity and rpm.
 - Add single file to run geometry, meshing and simulation in a single run
 - Allow the user to select number of processor in Fluent (default is 2) to speed up simulation process
 - Add some unittesting with examples
+
 
 
 
