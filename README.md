@@ -1,3 +1,7 @@
+```bash
+pip install ansys-geometry-core
+
+
 # Temat: Modelowanie turbin wiatrowych
 
 Cel: opracowanie szczegółowego tutorialu w formie prezentacji PowerPoint ukazującego proces przygotowywania geometrii, siatkowania i prowadzenia symulacji wariantowych na przykładzie turbiny wiatrowej o pionowej osi obrotu w środowisku PyAnsys, celem przeprowadzenia obliczeń w sposób zautomatyzowany.
@@ -25,6 +29,7 @@ Symulacja we Fluencie powinna uwzględniąć analizę wariantową dla różnych:
  - prędkości obrotowych turbiny
 
 W prowadzonej analizie użytkownik powinien mieć wgląd w raporty z każdej symulacji ukazujące residua, moment i moc na turbinie, prędkość obrotową, bilans masy. Użytkownik powinien móc na bazie symulacji ocenić ich wiarygodność i przeprowadzić konieczny post-processing danych, z możliwością podglądu konturu modułu prędkości w domenie co n iteracji. Na dysku został zamieszczony przykładowy projekt turbiny 3D_3_mrf jako punkt odniesienia
+
 
 
 
