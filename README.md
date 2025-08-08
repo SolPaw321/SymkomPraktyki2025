@@ -11,8 +11,10 @@ pip install ansys-meshing-prime[all]==0.9.0
 pip install ansys-fluent-core==0.33.0
 ```
 
+This project is working with 25R2 ANSYS env.
+
 # Important note before use
-The geometry allows for the generation of a vertical-axis wind turbine model in both 3D and 2D versions.
+The geometry allows for the generation of a vertical-axis wind turbine model in both 3D and 2D versions. Also, we do not recommend changing the names of components.
 
 Full meshing currently works only for the previously generated 3D model. Work on this is ongoing.
 
@@ -62,6 +64,9 @@ The user can:
   - using setter `Meshing.set_mesh_util_d_p(...)`
 - override all the above parameters locally using dedicated functions, e.g. `Meshing.create_curvature_size_control(name, min_local=10.0, max_local=100.0)`
 
+
+### Fluent
+Currently supports only inlet velocity and rpm.
 
 
 
