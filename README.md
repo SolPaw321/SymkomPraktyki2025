@@ -68,7 +68,16 @@ The user can:
 ### Fluent
 Currently supports only inlet velocity and rpm.
 
-
+# TODO
+- Resolve the issue of unrealistically high velocities in the Fluent simulation
+- Create a complete mesh for the 2D model
+- Implement parameter checks (e.g., the maximum number of blades allowed for a given circle radius to prevent blade overlap)
+- Validate the size of the blade model provided by the user
+- Finalize validation of user input data
+- Implement checks for user-defined names
+- Allow the user to select the meshing method (TET, HEX, POLY, or quadratic)
+- Add the option to generate user-defined reports and plots (UDF)
+- Finalize parameterization of initial conditions selected by the user
 
 
 
