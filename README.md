@@ -38,13 +38,23 @@ Fluent/main.py
 ### Geometry
 The user can:
 - Choose the model variant (`2D` or `3D`)
-- Generate blade profiles using a built-in function that calculates the points, or upload a custom model to:
+- Generate blade profiles using a built-in function that calculates the points from provided NACA 4-digit code, or upload a custom model to:
   - `Geometry/airfoil_model/2D/` for 2D models
   - `Geometry/airfoil_model/3D/` for 3D models
 - Set the number of blades
 - Define the angle of attack
 - Specify the radius of the circle on which the blades are arranged
-- Set the width of the ring in which the blades are immersed
+- Set the width (spread) of the ring in which the blades are immersed
+
+All of the above options are available in the file `Geometry/main.py`.
+
+
+### Meshing
+The user can:
+- modify default parameters for global, curvature, and BOI sizing in `Mesh/default_params/SizingParams.py`, e.g., minimum and maximum cell size, growth rate
+- modify default prism control parameters in `Mesh/default_params/PrismParams.py`, such as number of layers, first layer height, and growth rate
+- modify default parameters for the `prime.lucid.Mesh` module in `Mesh/default_params/MeshUtilParams.py`
+- override all the above parameters locally using dedicated functions, e.g. `Meshing.create_curvature_size_control(name, min_local=10.0, max_local=100.0)`
 
 
 
