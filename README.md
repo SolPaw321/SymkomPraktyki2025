@@ -51,10 +51,17 @@ All of the above options are available in the file `Geometry/main.py`.
 
 ### Meshing
 The user can:
-- modify default parameters for global, curvature, and BOI sizing in `Mesh/default_params/SizingParams.py`, e.g., minimum and maximum cell size, growth rate
-- modify default prism control parameters in `Mesh/default_params/PrismParams.py`, such as number of layers, first layer height, and growth rate
-- modify default parameters for the `prime.lucid.Mesh` module in `Mesh/default_params/MeshUtilParams.py`
+- modify default parameters for global, curvature, and BOI sizing, e.g., minimum and maximum cell size, growth rate
+  - manualy in `Mesh/default_params/SizingParams.py` file
+  - using setters, e.g. `Meshing.set_curvature_s_d_p(...)`
+- modify default prism control parameters, such as number of layers, first layer height, and growth rate
+  - manualy in `Mesh/default_params/PrismParams.py` file
+  - using setter `Meshing.set_prism_s_d_p(...)`
+- modify default parameters for the `prime.lucid.Mesh` module
+  - manualy in `Mesh/default_params/MeshUtilParams.py`
+  - using setter `Meshing.set_mesh_util_d_p(...)`
 - override all the above parameters locally using dedicated functions, e.g. `Meshing.create_curvature_size_control(name, min_local=10.0, max_local=100.0)`
+
 
 
 
