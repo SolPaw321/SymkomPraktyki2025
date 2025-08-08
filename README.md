@@ -9,6 +9,7 @@ Dependencies:
 pip install ansys-geometry-core[all]==0.11.0
 pip install ansys-meshing-prime[all]==0.9.0
 pip install ansys-fluent-core==0.33.0
+pip install numpy==2.2.6
 ```
 
 This project is working with 25R2 ANSYS environment.
@@ -81,6 +82,7 @@ Currently supports only inlet velocity and rpm.
 - Add single file to run geometry, meshing and simulation in a single run
 - Allow the user to select number of processor in Fluent (default is 2) to speed up simulation process
 - Add some unittesting with examples
+
 
 
 
