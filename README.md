@@ -70,8 +70,8 @@ The user can:
 Currently supports only inlet velocity and rpm.
 
 # TODO
-- #### Resolve the issue of unrealistically high velocities in the Fluent simulation
-- Create a complete mesh for the 2D model
+- #### Resolve the issue of unrealistically high velocities in the Fluent simulation (bug probably related to topology sharing in Fluent stage)
+- Create a complete mesh for the 2D model (prism layers or multizones)
 - Implement parameter checks (e.g., the maximum number of blades allowed for a given circle radius to prevent blade overlap)
 - Validate the size of the blade model provided by the user
 - Finalize validation of user input data
@@ -82,6 +82,7 @@ Currently supports only inlet velocity and rpm.
 - Add single file to run geometry, meshing and simulation in a single run
 - Allow the user to select number of processor in Fluent (default is 2) to speed up simulation process
 - Add some unittesting with examples
+
 
 
 
