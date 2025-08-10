@@ -133,9 +133,10 @@ class ModelerController:
         self._design.create_named_selection(named_selection_name, bodies=component.bodies)
 
     def add_symmetry_named_selection(self):
-        if self._model_type != "3D":
-            raise NotImplementedError('symmetry not implemented for 2D')
+        """
+        Add symmetry named selection into your model.
 
+        """
         symmetry_faces = []
         for component in self._design.components:
             for body in component.bodies:
@@ -208,7 +209,7 @@ class ModelerController:
         ring_element_id = [element.id for element in ring_elements_old]
 
         # subtract airfoil from ring
-        ring_body.subtract(airfoil_component.bodies, keep_other=True)
+        ring_body.subtract(airfoil_component.bodies, keep_other=False)
 
         # get new ring elements
         ring_elements_new = ring_body.faces if self._model_type == "3D" else ring_body.edges
@@ -221,24 +222,6 @@ class ModelerController:
             self._design.create_named_selection("wall", faces=wall_)
         else:
             self._design.create_named_selection("wall", edges=wall_)
-
-    def cut(self, cake_name: str,
-            knife_name: str):
-        """
-        Cut 'cake_name' component with 'knife_name' sketch.
-
-        Args:
-            cake_name (str): name of component to cut
-            knife_name (str): name of cutting sketch
-        """
-        # get base and cutter components by name
-        base_component = self._components[cake_name]
-        cutter_component = self._components[knife_name]
-
-        # subtract every cutter body form every base body
-        base_bodies = base_component.bodies
-        for base_body in base_bodies:
-            base_body.subtract(cutter_component.bodies, keep_other=True)
 
     def load_airfoils(self,
                       file_name: str,
@@ -269,11 +252,10 @@ class ModelerController:
 
         # read your Geometry
         self._design = self.modeler.open_file(path)
-        self._design.set_name = self._design_name   # available in 25R2
+        self._design.set_name = self._design_name  # available in 25R2
         self._design.components[0].set_name = "NACA"  # available in 25R2
 
         comp = self._design.add_component("NACA")
-        # self._design.delete_body()
 
         # get your Geometry as component and add to components dictionary
         component = self._design.components[0]
@@ -282,7 +264,7 @@ class ModelerController:
 
         # get your geometry as a body and scale
         airfoil = component.bodies[0]
-        airfoil.scale(10)
+        airfoil.scale(10) if self._model_type == "3D" else airfoil.scale(100)
 
         if self._model_type == "3D":
             airfoil_vertices_z = [vertex.z.m for vertex in airfoil.vertices]
