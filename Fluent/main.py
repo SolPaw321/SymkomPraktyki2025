@@ -32,7 +32,7 @@ solver.initialize(init_iter=10)
 # --- Run simulation --- #
 solver.run(run_iter=350)
 
-sleep(1000000)
+sleep(10000000)
 
 # --- Exit Fluent session --- #
 solver.exit()

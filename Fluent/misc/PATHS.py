@@ -1,4 +1,5 @@
 from pathlib import Path
+from config import ANSYS_PATH
 
 FLUENT = Path(__file__).resolve().parent.parent
 
@@ -8,4 +9,4 @@ MESH_3D = MESH / 'results' / 'mesh_3d'
 
 WORK_DIR = FLUENT / "work_directory"
 
-FLUENT_PATH = r"D:\ansys_student\ANSYS Inc\ANSYS Student\v252\fluent"
+FLUENT_PATH = Path(ANSYS_PATH) / Path("fluent")

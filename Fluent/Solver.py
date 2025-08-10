@@ -24,7 +24,7 @@ class SolverMode(Session):
 
         # set inlet velocity and rpm
         self._inlet_velocity = inlet_velocity  # m/s
-        self._rpm = rpm  # rev/min
+        self._rpm = -rpm  # rev/min
 
         # some shortcuts
         self.setup = self.session.settings.setup
@@ -64,7 +64,7 @@ class SolverMode(Session):
         inlet = self.setup.boundary_conditions.velocity_inlet["inlet"]
         inlet.turbulence.turbulent_intensity.set_state(0.05)
         inlet.momentum.velocity_magnitude.set_state(self._inlet_velocity)
-        inlet.turbulence.turbulent_viscosity_ratio.set_state(10)
+        inlet.turbulence.turbulent_viscosity_ratio.set_state(self._inlet_velocity)
 
         # outlet boundary condition
         self.setup.boundary_conditions.set_zone_type(zone_list=["outlet"], new_type="pressure-outlet")
@@ -130,7 +130,7 @@ class SolverMode(Session):
         # Efficiency named expression
         self.setup.named_expressions.create("Efficiency")
         efficiency = self.setup.named_expressions["Efficiency"]
-        efficiency.definition.set_state("power/(0.5*1.225[kg/s]*1[m]*2[m]*velocity_inlet^3)*100*1[m^3 s^-1 rad^-1]")
+        efficiency.definition.set_state("Power/(0.5*1.225[kg/s]*1[m]*2[m]*velocity_inlet^3)*100*1[m^3 s^-1 rad^-1]")
 
     def create_report_def_and_plots(self):
         """
