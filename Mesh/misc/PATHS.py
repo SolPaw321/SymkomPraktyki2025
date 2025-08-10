@@ -1,9 +1,9 @@
 from pathlib import Path
 from Geometry.misc.PATHS import RESULTS_MODEL_2D as GEOMETRY_MODEL_2D
 from Geometry.misc.PATHS import RESULTS_MODEL_3D as GEOMETRY_MODEL_3D
+from config import ANSYS_PATH
 
-
-ANSYS_PRIME = r"D:\ansys_student\ANSYS Inc\ANSYS Student\v252\meshing\Prime"
+ANSYS_PRIME = Path(ANSYS_PATH) / Path("meshing\Prime")
 
 TEST_MESH = Path(__file__).resolve().parent.parent
 

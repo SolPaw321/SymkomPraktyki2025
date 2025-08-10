@@ -94,9 +94,6 @@ class Meshing(PrimeClient, MeshingParams):
                 file_name=str(path)
             )
 
-        for part in self._model.parts:
-            part.remove_labels_from_topo_entities([part.name], part.get_topo_faces())
-
     def create_surface_mesh_with_size_control(self,
                                               part_expression: str | None = "*",
                                               size_control_names: str = "*",
@@ -118,7 +115,7 @@ class Meshing(PrimeClient, MeshingParams):
         self._mesh_util.surface_mesh_with_size_controls(
             size_control_names=size_control_names,
             generate_quads=generate_quads,
-            scope=scope
+            scope=scope,
         )
 
         return scope
@@ -202,6 +199,9 @@ class Meshing(PrimeClient, MeshingParams):
 
         # create zones
         self._mesh_util.create_zones_from_labels(label_expression=label_expression)
+
+    def create_zones_from_all_labels(self):
+        self._mesh_util.create_zones_from_labels()
 
     def compute_volumes(self, part_expression: str):
         """
@@ -315,6 +315,7 @@ class Meshing(PrimeClient, MeshingParams):
                 offset_type=prime.PrismControlOffsetType.UNIFORM,
                 n_layers=n_layers_local if n_layers_local else self.prism_d_p.n_layers,
                 first_height=first_height_local if first_height_local else self.prism_d_p.first_height,
+                min_aspect_ratio=2,
                 growth_rate=growth_rate_local if growth_rate_local else self.prism_d_p.growth_rate
             )
         )
@@ -323,9 +324,9 @@ class Meshing(PrimeClient, MeshingParams):
         return prism_control
 
     def generate_volume_mesh(self,
-                             prism_control: PrismControl,
-                             volume_control: VolumeControl,
-                             part: Part):
+                             part: Part,
+                             prism_control: PrismControl = None,
+                             volume_control: VolumeControl = None):
         """
         Generate volume mesh.
 
@@ -340,14 +341,30 @@ class Meshing(PrimeClient, MeshingParams):
         # set volume mesh params
         auto_mesh_param = prime.AutoMeshParams(
             model=self._model,
-            prism_control_ids=[prism_control.id],
+            prism_control_ids=[prism_control.id] if prism_control else None,
             size_field_type=prime.SizeFieldType.VOLUMETRIC,
             volume_fill_type=prime.VolumeFillType.TET,
-            volume_control_ids=[volume_control.id],
+            volume_control_ids=[volume_control.id] if volume_control else None,
         )
 
         # generate mesh
         volume_mesh.mesh(part.id, auto_mesh_param)
+
+    def generate_volume_control_rest(self):
+        volume_mesh = prime.AutoMesh(self._model)
+
+        # set volume mesh params
+        auto_mesh_param = prime.AutoMeshParams(
+            model=self._model,
+            # prism_control_ids=[prism_control.id],
+            size_field_type=prime.SizeFieldType.VOLUMETRIC,
+            volume_fill_type=prime.VolumeFillType.TET,
+            # volume_control_ids=[volume_control.id],
+        )
+
+        # generate mesh
+        for part in self._model.parts:
+            volume_mesh.mesh(part.id, auto_mesh_param) if part.name not in ('fluid-2', 'boi') else None
 
     def set_scope(self,
                   size_control: SizeControl,
@@ -416,24 +433,28 @@ class Meshing(PrimeClient, MeshingParams):
         """
         # set export mesh fluent params
         params = prime.ExportFluentMeshingMeshParams(
-            model=self._model
+            model=self._model,
+            cff_format=True
         )
 
         # export to mesh
-        print("Exporting to msh file...")
+        print("Exporting to msh.h5 file...")
         prime.FileIO(self._model).export_fluent_meshing_mesh(
-            file_name=str(MESH_3D / f"{file_name}.msh"),
+            file_name=str(MESH_3D / f"{file_name}.msh.h5"),
             export_fluent_mesh_params=params
         )
 
         # set export case fluent params
         params = prime.ExportFluentCaseParams(
-            model=self._model
+            model=self._model,
+            cff_format=True
         )
 
-        # export to cas.h5
-        print("Exporting to cas.h5 file...")
-        prime.FileIO(self._model).export_fluent_case(
-            file_name=str(MESH_3D / f"{file_name}.cas.h"),
-            export_fluent_case_params=params
-        )
+    def print_all_parts_summary(self):
+        for part in self._model.parts:
+            if part.name != "boi":
+                params = prime.PartSummaryParams(
+                    model=self._model,
+                    print_mesh=True
+                )
+                print(part.get_summary(params=params))
