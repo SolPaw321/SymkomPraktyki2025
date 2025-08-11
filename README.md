@@ -1,3 +1,35 @@
+# Info
+### Topic: Wind Turbine Modeling
+
+Objective: To develop a detailed tutorial in the form of a PowerPoint presentation demonstrating the process of preparing geometry, meshing, and conducting parametric simulations of a vertical-axis wind turbine (VAWT) in the PyAnsys environment, with the aim of performing calculations in an automated manner.
+
+### Format
+Presentation prepared using the provided Symkom template.
+
+### Structure
+The tutorial should present all stages in sequence and include:
+- Required Python code with commentary and essential notes from the user’s perspective
+- Screenshots of the generated geometry
+- Screenshots of the generated computational mesh
+
+The code snippet on each slide should correspond directly to the visuals and commentary presented.
+
+Steps to include: Modeling of a VAWT where the user can control:
+- Number of blades
+- Blade pitch angle
+- Airfoil profile type
+- Blade length
+- Distance of blades from the center
+
+The turbine’s center should be positioned at the origin of the coordinate system, with the airfoil extruded along the Z-axis. The geometry should include an additional volume with a refinement field (Body of Influence). The recommended meshing algorithm is Sweep/Multizone.
+
+Simulation in Fluent should involve parametric analysis for varying:
+- Geometries
+- Wind inlet velocities
+- Turbine rotational speeds
+
+During the analysis, the user should have access to reports from each simulation showing residuals, torque and power on the turbine, rotational speed, and mass balance. Based on the simulations, the user should be able to assess their reliability and perform the necessary post-processing, with the option to preview the velocity magnitude contour in the domain every n iterations.
+
 # Instalation
 Project instalation using:
 ```bash
@@ -69,6 +101,9 @@ The user can:
 ### Fluent
 Currently supports only inlet velocity and rpm.
 
+# Presentation
+Link: [Google Slieds](https://docs.google.com/presentation/d/1TS15-3GZw-e-8NaHIuEBRMNa9NwjnkPU/edit?usp=sharing&ouid=101068504685084610320&rtpof=true&sd=true)
+
 # TODO
 - #### Resolve the issue of unrealistically high velocities in the Fluent simulation (bug probably related to topology sharing in Fluent stage)
 - Create a complete mesh for the 2D model (prism layers or multizones)
@@ -82,6 +117,7 @@ Currently supports only inlet velocity and rpm.
 - Add single file to run geometry, meshing and simulation in a single run
 - Allow the user to select number of processor in Fluent (default is 2) to speed up simulation process
 - Add some unittesting with examples
+
 
 
 
